@@ -1,0 +1,74 @@
+<PostureCorrector>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '10dp'
+        spacing: '10dp'
+        
+        # Câmeras
+        BoxLayout:
+            orientation: 'horizontal'
+            spacing: '10dp'
+            size_hint_y: 0.8
+            
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: '5dp'
+                
+                Image:
+                    id: frontal_cam
+                    keep_ratio: True
+                    allow_stretch: False
+                
+                MDLabel:
+                    id: frontal_angle
+                    text: "FRONTAL: Ângulos"
+                    halign: 'center'
+                    font_style: 'Caption'
+                
+                MDLabel:
+                    id: frontal_status
+                    text: "STATUS"
+                    halign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: 0, 1, 0, 1
+            
+            BoxLayout:
+                orientation: 'vertical'
+                spacing: '5dp'
+                
+                Image:
+                    id: lateral_cam
+                    keep_ratio: True
+                    allow_stretch: False
+                
+                MDLabel:
+                    id: lateral_angle
+                    text: "LATERAL: Ângulos"
+                    halign: 'center'
+                    font_style: 'Caption'
+                
+                MDLabel:
+                    id: lateral_status
+                    text: "STATUS"
+                    halign: 'center'
+                    theme_text_color: "Custom"
+                    text_color: 0, 1, 0, 1
+        
+        # Controles
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: 0.1
+            spacing: '20dp'
+            
+            MDRaisedButton:
+                text: 'Calibrar'
+                on_press: root.calibrar()
+                size_hint_x: 0.3
+            
+            MDLabel:
+                id: status
+                text: "NÃO CALIBRADO"
+                halign: 'center'
+                theme_text_color: "Custom"
+                text_color: 1, 0, 0, 1
+                font_style: 'H6'
