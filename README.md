@@ -1,4 +1,6 @@
-# Cervicalia
+<p align="center">
+  <img src="readme/img/logo_b2.png" alt="Logo" width="300" height="300">
+</p>
 
 _Matheus Vinícius Pires Massing_
 
@@ -116,9 +118,9 @@ O projeto em fase inicial de MVP  **não utiliza banco de dados**, uma vez que s
 
 ### Demais Artefatos
 
-* ![Canvas MVP](readme/img/canvas_mvp.png)
-* ![É- Não É - Faz - Não Faz](readme/img/produto.png)
-* ![Elevator Pitch](readme/img/elevator_pitch.png)
+![Canvas MVP](readme/img/canvas_mvp.png)
+![É- Não É - Faz - Não Faz](readme/img/produto.png)
+![Elevator Pitch](readme/img/elevator_pitch.png)
 
 ## Validação
 ⏳ 
