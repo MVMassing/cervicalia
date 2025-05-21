@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="readme/img/logo_b2.png" alt="Logo" width="300" height="300">
+  <img src="readme/img/logo.png" alt="Logo" width="300" height="300">
 </p>
 
 _Matheus Vinícius Pires Massing_
