@@ -44,11 +44,11 @@ pip install wheel
 
 **1.  Verifique se a câmera está conectada**.
 
-**2.  Execute o script `main.py`:**
+**2.  Execute o script `mvp.py`:**
 
 ```bash
 
-python  main.py
+python  mvp.py
 
 ```
 

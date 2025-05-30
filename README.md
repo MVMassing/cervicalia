@@ -28,15 +28,13 @@ Desenvolver uma aplicação multiplataforma capaz de detectar, alertar e documen
 
 ### Objetivos Específicos
 
-* Implementar a detecção de postura com duas câmeras (webcam e celular). ⏳
+* Implementar a detecção de postura com duas câmeras (webcam e celular). ✅
 
 * Exibir alertas visuais e sonoros em tempo real em caso de má postura. ✅
 
 * Gerar dashboards interativos com horários críticos e progresso postural. ⏳
 
 * Permitir sincronização de dados entre app Android e aplicativo desktop. ⏳
-
-* Exportar relatórios em CSV e PDF para acompanhamento. ⏳
 
 ## Stack Tecnológico
 
@@ -56,7 +54,6 @@ Desenvolver uma aplicação multiplataforma capaz de detectar, alertar e documen
 |------------------------|--------------------------|
 | Framework             | Kivy + KivyMD            |
 | Conexão da Câmera     | DroidCam (USB/Wi-Fi)     |
-| Notificações          | Firebase Cloud Messaging |
 
 #### Banco de Dados & Sincronização
 
@@ -78,19 +75,36 @@ Desenvolver uma aplicação multiplataforma capaz de detectar, alertar e documen
 
 O Cervicalia é um sistema de correção postural que utiliza duas câmeras (webcam e celular) para monitorar a postura do usuário em tempo real. A aplicação desktop realiza a análise de imagem com MediaPipe e emite alertas sonoros e visuais sempre que a postura correta não é mantida por mais de alguns segundos.
 
-A interface do sistema permitirá que o usuário visualize gráficos de progresso, exporte relatórios personalizados e configure os parâmetros de alerta. O aplicativo Android atua como visualizador e configurador remoto, além de utilizar a câmera lateral para melhor análise da posição corporal.
+A interface do sistema permitirá que o usuário visualize gráficos de progresso e exporte relatórios, com o aplicativo Android atuando como visualizador e configurador remoto.
 
 A sincronização ocorrerá por meio de um banco local (SQLite) e uma base na nuvem (Firebase), garantindo funcionalidade offline e mobilidade entre dispositivos.
 
 ## Arquitetura
 
-O modelo de arquitetura adotado foi **Camadas Lógicas** (Inspirado em MVC), ainda que de forma implícita. Embora o **código inicial do MVP** esteja centralizado em um único script, é possível identificar separações conceituais entre:
+O Cervicalia segue um modelo híbrido, combinando elementos de MVC (Model-View-Controller) e Camadas Lógicas, adaptado para sistemas de visão computacional e sincronização multiplataforma.
 
-* **Camada de Apresentação** – Responsável pela interface com o usuário, utilizando o OpenCV para exibição das imagens, desenhos de esqueleto e ângulos, e feedback visual da postura.
+### Fluxo de Funcionamento
 
-* **Camada de Processamento** – Contém a lógica de negócio do sistema, incluindo o cálculo dos ângulos do corpo, a calibração automática com base nos primeiros quadros e a verificação da postura com base nos limites calculados.
+**1. Captura da Imagem**
+- **Webcam (frontal):** Monitora ombros e pescoço.
+- **Celular (lateral via DroidCam):** Analisa curvatura cervical.
 
-* **Camada de Infraestrutura** – Encarregada do acesso à câmera, da conversão de cores para o modelo do MediaPipe, do uso da biblioteca de áudio `playsound` para emitir alertas e da manipulação do sistema de arquivos com a biblioteca `os`.
+**2. Processamento em Tempo Real**
+- **MediaPipe + OpenCV:** Detectam pontos-chave do corpo.
+- **Algoritmo de Ângulos:** Calcula inclinação dos ombros e pescoço.
+
+**3. Feedback e Alertas**
+- **Sonoro, via playsound:** `alert.wav`.
+- **Visual:** Via KivyMD indicando a qualidade da postura.
+
+**4. Armazenamento Local**
+- **SQLite:** Registra eventos de má postura.
+
+**5. Sincronização (Futuro)**
+- **Firebase:** Recebe dados do desktop para o app Android.
+
+**6. Relatórios (em progresso)**
+- **Pandas + Matplotlib:** Geram gráficos e exportam arquivos em CSV/PDF.
 
 ---
 
@@ -100,21 +114,32 @@ O modelo de arquitetura adotado foi **Camadas Lógicas** (Inspirado em MVC), ain
 
 ---
 
-### Visão Lógica
-
-### Diagrama de Classes
-
-Embora o código atual seja procedural, a lógica pode ser representada em termos de responsabilidades funcionais como se fossem classes/conjuntos:
-
-⏳ 
+## Visão Lógica
 
 ### Banco de Dados
 
-O projeto em fase inicial de MVP  **não utiliza banco de dados**, uma vez que seu funcionamento é baseado em captura em tempo real e processamento local da imagem. No entanto, está sendo desenvolvida solução que registra os dados usando SQLite com uma estrutura semelhante a:
+Está sendo desenvolvida solução que registra os dados usando SQLite com uma estrutura semelhante a:
 
-| id | timestamp           | angulo_ombro | angulo_pescoco | tipo_postura  |
+| id | timestamp           | angulo_ombro | angulo_pescoco | camera  |
 |----|---------------------|--------------|----------------|----------------|
-| 1  | 2025-05-13 10:45:00 | 65.2         | 42.8           | "Postura Ruim" |
+| 1  | 2025-05-13 10:45:00 | 65.2         | 42.8           | Lateral |
+| 2  | 2025-05-13 10:47:00 | 68.2         | 43.6           | Frontal |
+
+Tal solução visa criar um banco de dados para embasar os dashboards e estatísticas no app mobile.
+
+### Estrutura da Tabela: `postura`
+
+| Coluna          | Tipo SQLite          | Restrições / Validação                                        |
+|-----------------|----------------------|--------------------------------------------------------------|
+| `id`            | INTEGER              | PRIMARY KEY AUTOINCREMENT                                    |
+| `timestamp`     | TEXT                 | NOT NULL (formato ISO 8601 recomendado)                      |
+| `angulo_ombro`  | REAL                 | NOT NULL (valor numérico representando ângulo em graus)      |
+| `angulo_pescoco`| REAL                 | NOT NULL (valor numérico representando ângulo em graus)      |
+| `camera`        | TEXT                 | NOT NULL, **valores permitidos**: `'lateral'` ou `'frontal'` |
+
+### Validação:
+- `camera` possui **restrição CHECK** para aceitar apenas `'lateral'` ou `'frontal'`.
+- `timestamp` deve ser armazenado preferencialmente no formato **ISO 8601** (`YYYY-MM-DD HH:MM:SS`).
 
 ### Demais Artefatos
 
@@ -139,12 +164,20 @@ O projeto em fase inicial de MVP  **não utiliza banco de dados**, uma vez que s
 
 ## Referências Bibliográficas
 
-WAZLAWICK, Raul Sidnei. Metodologia de pesquisa para ciência da computação. Rio de Janeiro: Elsevier, 2009
+- **ZHU, C.; SHAO, R.; ZHANG, X.; GAO, S.; LI, B.** Application of Virtual Reality Based on Computer Vision in Sports Posture Correction. *Wireless Communications and Mobile Computing*, 2022, p. 1-15. [https://doi.org/10.1155/2022/3719971](https://doi.org/10.1155/2022/3719971)
+
+- **CAI, D.; LIN, S.** A Study on Posture Correction Based on Computer Vision. In: *Applied Mechanics and Materials*, v. 513-517, p. 3207-3211, 2014. [https://doi.org/10.4028/www.scientific.net/AMM.513-517.3207](https://doi.org/10.4028/www.scientific.net/AMM.513-517.3207)
+
+- **SITAPARA, S.; D.P., A.; JAIN, M.; SINGH, S.; GUPTA, N.** Novel Approach for Real-Time Exercise Posture Correction Using Computer Vision and CNN. In: *2023 International Conference on Ambient Intelligence, Knowledge Informatics and Industrial Electronics (AIKIIE)*, 2023, p. 1-6. [https://doi.org/10.1109/AIKIIE60097.2023.10389979](https://doi.org/10.1109/AIKIIE60097.2023.10389979)
+
+- **TAN, Z.; SEOW, B.** Development of a Posture Corrector Device with Data Analysis System. In: *Lecture Notes in Mechanical Engineering*, 2022. [https://doi.org/10.1007/978-981-16-8954-3_1](https://doi.org/10.1007/978-981-16-8954-3_1)
+
+- **RAJU, J.; REDDY, Y.; PRADEEPREDDY, G.** Smart Posture Detection and Correction System Using Skeletal Points Extraction. In: *Learning and Analytics in Intelligent Systems*, 2019. [https://doi.org/10.1007/978-3-030-24322-7_23](https://doi.org/10.1007/978-3-030-24322-7_23)
 
 ## Demais Links
 
-### [Configurações e Requisitos](readme/configuracoes_e_requisitos.md)
+### [Configurações e Requisitos do MVP](readme/configuracoes_e_requisitos.md)
 
-### [Desenvolvimento da Solução](readme/desenvolvimento_da_solucao.md)
+### [Desenvolvimento da Solução do MVP](readme/desenvolvimento_da_solucao.md)
 
 ### [POSTMORTEM](readme/postmortem.md)
