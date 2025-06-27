@@ -1,4 +1,4 @@
-<PostureCorrector>:
+<PostureMonitorScreen>:
     BoxLayout:
         orientation: 'vertical'
         padding: '10dp'
@@ -62,7 +62,12 @@
             
             MDRaisedButton:
                 text: 'Calibrar'
-                on_press: root.calibrar()
+                on_press: root.calibrate()
+                size_hint_x: 0.3
+            
+            MDRaisedButton:
+                text: 'Voltar'
+                on_press: root.go_back()
                 size_hint_x: 0.3
             
             MDLabel:
@@ -71,4 +76,4 @@
                 halign: 'center'
                 theme_text_color: "Custom"
                 text_color: 1, 0, 0, 1
-                font_style: 'H6'
+                font_style: 'H6' 
