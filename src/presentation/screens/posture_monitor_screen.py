@@ -4,7 +4,8 @@ from kivy.graphics.texture import Texture
 import cv2
 import time
 import os
-from playsound import playsound
+import threading
+import winsound
 
 from ...infrastructure.camera.camera_thread import CameraThread
 from ...application.services.posture_analysis_service import PostureAnalysisService
@@ -21,6 +22,8 @@ class PostureMonitorScreen(Screen):
         self.lateral_processor = None
         self.lateral_thread = None
         self.frontal_processor = None
+        self.last_save_time = 0
+        self.save_interval = 5
     
     def setup_cameras(self, frontal_only=True, lateral_ip=""):
         self.frontal_only = frontal_only
@@ -71,6 +74,7 @@ class PostureMonitorScreen(Screen):
             self.show_frame(frame_annotated, 'frontal')
             if analysis_result and self.is_calibrated:
                 self.update_interface(analysis_result, 'frontal')
+                self.save_posture_data(analysis_result, 'frontal')
         
         if not self.frontal_only and self.lateral_thread and self.lateral_processor:
             lateral_frame = self.lateral_thread.get_frame()
@@ -79,6 +83,7 @@ class PostureMonitorScreen(Screen):
                 self.show_frame(frame_annotated, 'lateral')
                 if analysis_result and self.is_calibrated:
                     self.update_interface(analysis_result, 'lateral')
+                    self.save_posture_data(analysis_result, 'lateral')
     
     def show_frame(self, frame, camera_type):
         try:
@@ -113,6 +118,23 @@ class PostureMonitorScreen(Screen):
         except Exception as e:
             print(f"Erro ao atualizar interface {camera_type}: {e}")
     
+    def save_posture_data(self, analysis_result, camera_type):
+        """Salva dados de postura periodicamente"""
+        current_time = time.time()
+        if current_time - self.last_save_time > self.save_interval:
+            try:
+                if analysis_result and analysis_result.calibration_data:
+                    self.monitoring_use_case.process_posture_frame(
+                        analysis_result.shoulder_angle,
+                        analysis_result.neck_angle,
+                        camera_type,
+                        analysis_result.calibration_data
+                    )
+                    self.last_save_time = current_time
+                    print(f"Dados {camera_type} salvos")
+            except Exception as e:
+                print(f"Erro ao salvar dados {camera_type}: {e}")
+    
     def save_alert_data(self):
         try:
             if hasattr(self, 'frontal_processor') and self.frontal_processor:
@@ -140,17 +162,34 @@ class PostureMonitorScreen(Screen):
         except Exception as e:
             print(f"Erro ao salvar dados do alerta: {e}")
     
+    def play_alert_sound(self):
+        """Reproduz alerta sonoro usando winsound (mais confiável em executáveis)"""
+        def play_sound():
+            try:
+                print("Tocando alerta sonoro...")
+                winsound.Beep(800, 200) 
+                time.sleep(0.1)
+                winsound.Beep(1000, 200)
+                time.sleep(0.1)
+                winsound.Beep(1200, 300)
+                
+                print("Alerta sonoro reproduzido com sucesso!")
+                
+            except Exception as e:
+                print(f"Erro ao reproduzir alerta sonoro: {e}")
+                try:
+                    winsound.Beep(1000, 500)
+                    print("Alerta sonoro simples reproduzido")
+                except:
+                    print("Não foi possível reproduzir nenhum alerta sonoro")
+        threading.Thread(target=play_sound, daemon=True).start()
+    
     def check_alert(self):
         current_time = time.time()
         if current_time - self.last_alert_time > self.alert_interval:
-            try:
-                if os.path.exists(self.alert_sound):
-                    playsound(self.alert_sound, block=False)
-                    print("Alerta sonoro acionado!")
-                    self.last_alert_time = current_time
-                    self.save_alert_data()
-            except Exception as e:
-                print(f"Erro ao reproduzir alerta: {e}")
+            self.play_alert_sound()
+            self.last_alert_time = current_time
+            self.save_alert_data()
     
     def calibrate(self):
         if hasattr(self, 'frontal_processor') and self.frontal_processor:
