@@ -138,8 +138,6 @@ Durante o período de testes, o sistema registrou um total de **1.172 ocorrênci
 - **Ocorrências no primeiro dia (27/06)**: 217
 - **Ocorrências no último dia (04/07):** 113
 - **Redução percentual entre o primeiro e o último dia:** 47,93%
-- **Número total de ocorrências LATERAIS**: 687
-- **Número total de ocorrências FRONTAIS**: 485
 
 ![Dados](readme/img/dados.png)
 
