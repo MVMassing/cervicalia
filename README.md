@@ -113,6 +113,9 @@ O armazenamento de dados do Cervicalia foi desenvolvido utilizando **SQLite**, c
 ### Demais Artefatos
 
 ![Canvas MVP](readme/img/canvas_mvp.png)
+
+---
+
 ![É- Não É - Faz - Não Faz](readme/img/produto.png)
 ![Elevator Pitch](readme/img/elevator_pitch.png)
 
