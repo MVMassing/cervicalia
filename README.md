@@ -6,6 +6,15 @@ _Matheus Vinícius Pires Massing_
 
 Este artigo apresenta a documentação do projeto **Cervicalia**, em conformidade com os requisitos da disciplina de Projeto de Desenvolvimento II, do curso de Análise e Desenvolvimento de Sistemas do Centro Universitário Senac-RS.
 
+> ⚠️ **ATENÇÃO:**  
+> Foi identificado um **erro no processo de compilação com o PyInstaller** que afetou a versão executável da release disponível na branch `main`.  
+> Esse erro está ocasionando **registros duplicados** no sistema de ocorrências.  
+>  
+> Portanto, **não utilize esta versão**.  
+>  
+> Utilize temporariamente a versão **antiga** disponível na branch:  
+> 👉 [`beta-v1.0.0`](https://github.com/MVMassing/cervicalia/tree/beta-v1.0.0)
+
 ## Resumo do Projeto
 
 A má postura adquirida durante longos períodos de home office ou estudo é uma das principais causas de dores crônicas no pescoço e nas costas. Essa condição compromete a saúde física e mental de milhões de trabalhadores e estudantes no mundo todo. O Cervicalia propõe uma solução tecnológica que utiliza visão computacional com múltiplas câmeras para detectar e alertar em tempo real sobre desvios posturais. Como consequência, a ferramenta promove maior consciência corporal, prevenção de lesões e aumento da produtividade, através de relatórios, gráficos e notificações ao usuário.
